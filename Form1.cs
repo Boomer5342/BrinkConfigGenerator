@@ -10,6 +10,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace BrinkConfigGenerator
 {
@@ -17,8 +19,14 @@ namespace BrinkConfigGenerator
     {
 
         private TextBox[] _videos;
-        private String _topDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Brink Config Generator\Configs " + DateTime.Today.ToString("MM-dd-yy");  
+        private String _topDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Brink Config Generator\Configs " + DateTime.Today.ToString("MM-dd-yy");
+        private String[] _xmlPaths = new String[]
 
+        {
+            "XMLConfigs/Station1/Register.cfg",
+            "XMLConfigs/Station2Plus/Register.cfg",
+            "XMLConfigs/Kitchen/Kitchen.cfg"
+        };
         public Form1()
         {
             InitializeComponent();
@@ -100,6 +108,8 @@ namespace BrinkConfigGenerator
 
         private void GenConfigBtn_Click(object sender, EventArgs e)
         {
+            String stationFullPath = "";
+            String videoFullPath = "";
             if (!Directory.Exists(_topDir))
             {
                 Directory.CreateDirectory(_topDir);
@@ -111,7 +121,7 @@ namespace BrinkConfigGenerator
                 for (int i = 1; i <= stationCount; i++)
                 {
                     var stationSubdir = "Station " + i;
-                    var stationFullPath = Path.Combine(_topDir, stationSubdir);
+                    stationFullPath = Path.Combine(_topDir, stationSubdir);
                     if (!Directory.Exists(stationFullPath))
                     {
                         Directory.CreateDirectory(stationFullPath);
@@ -124,7 +134,7 @@ namespace BrinkConfigGenerator
                 for (int i = 1; i <= videoCount; i++)
                 {
                     var videoSubdir = "Video " + _videos[i - 1].Text;
-                    var videoFullPath = Path.Combine(_topDir, videoSubdir);
+                    videoFullPath = Path.Combine(_topDir, videoSubdir);
                     if (!Directory.Exists(videoFullPath))
                     {
                         Directory.CreateDirectory(videoFullPath);
@@ -133,6 +143,7 @@ namespace BrinkConfigGenerator
 
             }
 
+            RegisterXMLModifier(stationFullPath, "\\Register.cfg", 0);
             OpenFolder(_topDir);
 
         }
@@ -152,6 +163,56 @@ namespace BrinkConfigGenerator
             {
                 MessageBox.Show(string.Format("{0} Directory does not exist!", folderPath));
             }
+        }
+
+        private void RegisterXMLModifier(String fullPath, String fileName, int index)
+        {
+            String location = locationIDTxt.Text;
+            String stationOneIP = stationOneIpTxt.Text;
+            String serverEndPoint = serverEndPointTxt.Text;
+            String backupEndPoint = backupEndPointTxt.Text;
+            String[] elements = new String[]
+            {
+                "//Register",
+                "//Register//EndPoint",
+                "//Register//ServerEndPoint",
+                "//Register//BackupEndPoint"
+            };
+
+            XmlDocument xmlLoader = new XmlDocument();
+            xmlLoader.Load(_xmlPaths[index]);
+            
+            for (int i = 1; i < elements.Length; i++)
+            {
+               XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i - 1]);
+                // STATION 1 CONFIG GENERATION
+                if (i == 1)
+                {
+                    elementLoader.SetAttribute("LocationUid", location); // Set to new value.
+                    elementLoader.SetAttribute("TerminalNumber", i.ToString()); // Set to new value.
+                } else if (i == 2)
+                {
+                    elementLoader.SetAttribute("Address", serverEndPoint); // Set to new value.
+                } else if (i == 3)
+                {
+                    elementLoader.SetAttribute("Address", serverEndPoint); // Set to new value.
+                }
+                // END STATION 1 CONFIG GENERATION
+            }
+            xmlLoader.Save(fullPath + fileName);
+        }
+        private void KitchenXMLModifier(String fullPath, String fileName)
+        {
+            String location = locationIDTxt.Text;
+
+            XmlDocument statOneConfig = new XmlDocument();
+            statOneConfig.Load("XMLConfigs/Station1/Register.xml");
+            XmlElement locationUid = (XmlElement)statOneConfig.SelectSingleNode("//Kitchen");
+            if (locationUid != null /* && locationIDTxt.Text != null */)
+            {
+                locationUid.SetAttribute("LocationUid", location); // Set to new value.
+            }
+            statOneConfig.Save(fullPath + fileName);
         }
 
     }
