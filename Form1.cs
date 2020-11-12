@@ -60,16 +60,17 @@ namespace BrinkConfigGenerator
 
         private void VideoChkBox_CheckedChanged(object sender, EventArgs e)
         {
-            if(videoChkBox.Checked)
+            if (videoChkBox.Checked)
             {
                 videoCmbo.Enabled = true;
-            } else
+            }
+            else
             {
                 videoCmbo.Enabled = false;
                 videoCmbo.Text = "Total Videos";
-            } 
+            }
 
-            for(int i = 0; i < _videos.Length; i++)
+            for (int i = 0; i < _videos.Length; i++)
             {
                 _videos[i].Enabled = false;
                 _videos[i].Text = "";
@@ -81,13 +82,13 @@ namespace BrinkConfigGenerator
         {
             int videoAmmount = int.Parse(videoCmbo.SelectedItem.ToString());
             int count = 0;
-            for(int i = 0;  i < videoAmmount; i++)
+            for (int i = 0; i < videoAmmount; i++)
             {
                 _videos[i].Enabled = true;
                 count++;
             }
 
-            while(count < _videos.Length)
+            while (count < _videos.Length)
             {
                 _videos[count].Enabled = false;
                 _videos[count].Text = "";
@@ -110,6 +111,9 @@ namespace BrinkConfigGenerator
         {
             String stationFullPath = "";
             String videoFullPath = "";
+            int videoCount = 0;
+            int stationCount = 0;
+
             if (!Directory.Exists(_topDir))
             {
                 Directory.CreateDirectory(_topDir);
@@ -117,7 +121,7 @@ namespace BrinkConfigGenerator
 
             if (stationCmbo.Text != "Total Stations")
             {
-                int stationCount = int.Parse(stationCmbo.SelectedItem.ToString());
+                stationCount = int.Parse(stationCmbo.SelectedItem.ToString());
                 for (int i = 1; i <= stationCount; i++)
                 {
                     var stationSubdir = "Station " + i;
@@ -128,9 +132,14 @@ namespace BrinkConfigGenerator
                     }
                 }
             }
+            else
+            {
+                MessageBox.Show("Please select Total Stations");
+                return;
+            }
             if (videoCmbo.Text != "Total Videos")
             {
-                int videoCount = int.Parse(videoCmbo.SelectedItem.ToString());
+                videoCount = int.Parse(videoCmbo.SelectedItem.ToString());
                 for (int i = 1; i <= videoCount; i++)
                 {
                     var videoSubdir = "Video " + _videos[i - 1].Text;
@@ -142,8 +151,42 @@ namespace BrinkConfigGenerator
                 }
 
             }
+            else if (videoChkBox.Checked && videoCmbo.Text == "Total Videos")
+            {
+                MessageBox.Show("Please select Total Videos");
+                return;
+            }
 
-            RegisterXMLModifier(stationFullPath, "\\Register.cfg", 0);
+            for (int i = 1; i <= stationCount; i++)
+            {
+                if (i == 1)
+                {
+                    stationFullPath = _topDir + "\\Station 1";
+                    RegisterOneXMLModifier(stationFullPath, "\\Register.cfg", 0);
+                }
+                if (i != 1)
+                {
+                    stationFullPath = _topDir + "\\Station " + i;
+                    RegisterTwoPlusXMLModifier(stationFullPath, "\\Register.cfg", 1, i);
+                }
+            }
+
+            List<String> videoNums = new List<String>();
+
+            for (int i = 0; i < _videos.Length; i++)
+            {
+                if (_videos[i].Enabled == true)
+                {
+                    videoNums.Add(_videos[i].Text);
+                }
+            }
+
+            for (int i = 0; i < videoNums.Count; i++)
+            {
+                videoFullPath = _topDir + "\\Video " + videoNums[i];
+                KitchenXMLModifier(videoFullPath, "\\Kitchen.cfg", 2, videoNums[i]);
+            }
+
             OpenFolder(_topDir);
 
         }
@@ -165,7 +208,42 @@ namespace BrinkConfigGenerator
             }
         }
 
-        private void RegisterXMLModifier(String fullPath, String fileName, int index)
+        private void RegisterOneXMLModifier(String fullPath, String fileName, int index)
+        {
+            String location = locationIDTxt.Text;
+            String serverEndPoint = serverEndPointTxt.Text;
+            String[] elements = new String[]
+            {
+                "//Register",
+                "//Register//EndPoint",
+                "//Register//ServerEndPoint"
+            };
+
+            XmlDocument xmlLoader = new XmlDocument();
+            xmlLoader.Load(_xmlPaths[index]);
+            for (int i = 1; i <= elements.Length; i++)
+            {
+                XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i - 1]);
+                // STATION 1 CONFIG GENERATION
+                if (i == 1)
+                {
+                    elementLoader.SetAttribute("LocationUid", location); // Set to Location Value.
+                    elementLoader.SetAttribute("TerminalNumber", i.ToString()); // Set to the value of i.
+                }
+                else if (i == 2)
+                {
+                    elementLoader.SetAttribute("Address", serverEndPoint); // Set to Server Endpoint Value.
+                }
+                else if (i == 3)
+                {
+                    elementLoader.SetAttribute("Address", serverEndPoint); // Set to Server Endpoint Value.
+                }
+                // END STATION 1 CONFIG GENERATION
+
+            }
+            xmlLoader.Save(fullPath + fileName);
+        }
+        private void RegisterTwoPlusXMLModifier(String fullPath, String fileName, int index, int statNum)
         {
             String location = locationIDTxt.Text;
             String stationOneIP = stationOneIpTxt.Text;
@@ -181,39 +259,69 @@ namespace BrinkConfigGenerator
 
             XmlDocument xmlLoader = new XmlDocument();
             xmlLoader.Load(_xmlPaths[index]);
-            
-            for (int i = 1; i < elements.Length; i++)
+            for (int i = 0; i < elements.Length; i++)
             {
-               XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i - 1]);
-                // STATION 1 CONFIG GENERATION
-                if (i == 1)
+                XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i]);
+                // STATION 2 PLUS CONFIG GENERATION
+                if (i == 0)
                 {
-                    elementLoader.SetAttribute("LocationUid", location); // Set to new value.
-                    elementLoader.SetAttribute("TerminalNumber", i.ToString()); // Set to new value.
-                } else if (i == 2)
-                {
-                    elementLoader.SetAttribute("Address", serverEndPoint); // Set to new value.
-                } else if (i == 3)
-                {
-                    elementLoader.SetAttribute("Address", serverEndPoint); // Set to new value.
+                    elementLoader.SetAttribute("LocationUid", location); // Set to Location Value.
+                    elementLoader.SetAttribute("TerminalNumber", statNum.ToString()); // Set to the value of i.
                 }
-                // END STATION 1 CONFIG GENERATION
+                else if (i == 1)
+                {
+                    elementLoader.SetAttribute("Address", stationOneIP); // Set to Server Endpoint Value.
+                }
+                else if (i == 2)
+                {
+                    elementLoader.SetAttribute("Address", serverEndPoint); // Set to Server Endpoint Value.
+                }
+                else if (i == 3)
+                {
+                    elementLoader.SetAttribute("Address", backupEndPoint); // Set to Server Endpoint Value.
+                }
+                // END STATION 2 PLUS CONFIG GENERATION
+
             }
             xmlLoader.Save(fullPath + fileName);
         }
-        private void KitchenXMLModifier(String fullPath, String fileName)
+        private void KitchenXMLModifier(String fullPath, String fileName, int index, String videoNum)
         {
             String location = locationIDTxt.Text;
-
-            XmlDocument statOneConfig = new XmlDocument();
-            statOneConfig.Load("XMLConfigs/Station1/Register.xml");
-            XmlElement locationUid = (XmlElement)statOneConfig.SelectSingleNode("//Kitchen");
-            if (locationUid != null /* && locationIDTxt.Text != null */)
+            String stationOneIP = stationOneIpTxt.Text;
+            String serverEndPoint = serverEndPointTxt.Text;
+            String backupEndPoint = backupEndPointTxt.Text;
+            String[] elements = new String[]
             {
-                locationUid.SetAttribute("LocationUid", location); // Set to new value.
-            }
-            statOneConfig.Save(fullPath + fileName);
-        }
+                "//Kitchen",
+                "//Kitchen//EndPoint",
+                "//Kitchen//BackupEndPoint"
+            };
 
+            XmlDocument xmlLoader = new XmlDocument();
+            xmlLoader.Load(_xmlPaths[index]);
+            for (int i = 0; i < elements.Length; i++)
+            {
+                XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i]);
+                // STATION 2 PLUS CONFIG GENERATION
+                if (i == 0)
+                {
+                    elementLoader.SetAttribute("LocationUid", location); // Set to Location Value.
+                    elementLoader.SetAttribute("TerminalNumber", videoNum); // Set to the value of i.
+                }
+                else if (i == 1)
+                {
+                    elementLoader.SetAttribute("Address", stationOneIP); // Set to Server Endpoint Value.
+                }
+                else if (i == 2)
+                {
+                    elementLoader.SetAttribute("Address", backupEndPoint); // Set to Server Endpoint Value.
+                }
+                // END STATION 2 PLUS CONFIG GENERATION
+                xmlLoader.Save(fullPath + fileName);
+
+            }
+
+        }
     }
 }
