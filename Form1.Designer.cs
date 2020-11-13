@@ -45,6 +45,7 @@
             this.label8 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.videoOneTxt = new System.Windows.Forms.TextBox();
             this.videoFourteenTxt = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.videoThirteenTxt = new System.Windows.Forms.TextBox();
@@ -74,7 +75,6 @@
             this.label9 = new System.Windows.Forms.Label();
             this.genConfigBtn = new System.Windows.Forms.Button();
             this.resetBtn = new System.Windows.Forms.Button();
-            this.videoOneTxt = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -292,6 +292,15 @@
             this.groupBox2.TabIndex = 16;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Kitchen Video Settings";
+            // 
+            // videoOneTxt
+            // 
+            this.videoOneTxt.Enabled = false;
+            this.videoOneTxt.Location = new System.Drawing.Point(83, 85);
+            this.videoOneTxt.Margin = new System.Windows.Forms.Padding(4);
+            this.videoOneTxt.Name = "videoOneTxt";
+            this.videoOneTxt.Size = new System.Drawing.Size(53, 22);
+            this.videoOneTxt.TabIndex = 43;
             // 
             // videoFourteenTxt
             // 
@@ -576,15 +585,6 @@
             this.resetBtn.UseVisualStyleBackColor = false;
             this.resetBtn.Click += new System.EventHandler(this.ResetBtn_Click);
             // 
-            // videoOneTxt
-            // 
-            this.videoOneTxt.Enabled = false;
-            this.videoOneTxt.Location = new System.Drawing.Point(83, 85);
-            this.videoOneTxt.Margin = new System.Windows.Forms.Padding(4);
-            this.videoOneTxt.Name = "videoOneTxt";
-            this.videoOneTxt.Size = new System.Drawing.Size(53, 22);
-            this.videoOneTxt.TabIndex = 43;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -599,6 +599,7 @@
             this.MaximumSize = new System.Drawing.Size(1133, 484);
             this.MinimumSize = new System.Drawing.Size(1133, 484);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Brink Config Generator";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
