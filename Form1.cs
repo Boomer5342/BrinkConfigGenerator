@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace BrinkConfigGenerator
 {
@@ -111,50 +105,37 @@ namespace BrinkConfigGenerator
         {
             String stationFullPath = "";
             String videoFullPath = "";
-            int videoCount = 0;
-            int stationCount = 0;
+
+            if (!ErrorChecker())
+            {
+                return;
+            }
 
             if (!Directory.Exists(_topDir))
             {
                 Directory.CreateDirectory(_topDir);
             }
 
-            if (stationCmbo.Text != "Total Stations")
+            int stationCount = int.Parse(stationCmbo.SelectedItem.ToString());
+            for (int i = 1; i <= stationCount; i++)
             {
-                stationCount = int.Parse(stationCmbo.SelectedItem.ToString());
-                for (int i = 1; i <= stationCount; i++)
+                var stationSubdir = "Station " + i;
+                stationFullPath = Path.Combine(_topDir, stationSubdir);
+                if (!Directory.Exists(stationFullPath))
                 {
-                    var stationSubdir = "Station " + i;
-                    stationFullPath = Path.Combine(_topDir, stationSubdir);
-                    if (!Directory.Exists(stationFullPath))
-                    {
-                        Directory.CreateDirectory(stationFullPath);
-                    }
+                    Directory.CreateDirectory(stationFullPath);
                 }
             }
-            else
-            {
-                MessageBox.Show("Please select Total Stations");
-                return;
-            }
-            if (videoCmbo.Text != "Total Videos")
-            {
-                videoCount = int.Parse(videoCmbo.SelectedItem.ToString());
-                for (int i = 1; i <= videoCount; i++)
-                {
-                    var videoSubdir = "Video " + _videos[i - 1].Text;
-                    videoFullPath = Path.Combine(_topDir, videoSubdir);
-                    if (!Directory.Exists(videoFullPath))
-                    {
-                        Directory.CreateDirectory(videoFullPath);
-                    }
-                }
 
-            }
-            else if (videoChkBox.Checked && videoCmbo.Text == "Total Videos")
+            int videoCount = int.Parse(videoCmbo.SelectedItem.ToString());
+            for (int i = 1; i <= videoCount; i++)
             {
-                MessageBox.Show("Please select Total Videos");
-                return;
+                var videoSubdir = "Video " + _videos[i - 1].Text;
+                videoFullPath = Path.Combine(_topDir, videoSubdir);
+                if (!Directory.Exists(videoFullPath))
+                {
+                    Directory.CreateDirectory(videoFullPath);
+                }
             }
 
             for (int i = 1; i <= stationCount; i++)
@@ -303,7 +284,7 @@ namespace BrinkConfigGenerator
             for (int i = 0; i < elements.Length; i++)
             {
                 XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i]);
-                // STATION 2 PLUS CONFIG GENERATION
+                // KITCHEN VIDEO CONFIG GENERATION
                 if (i == 0)
                 {
                     elementLoader.SetAttribute("LocationUid", location); // Set to Location Value.
@@ -317,11 +298,67 @@ namespace BrinkConfigGenerator
                 {
                     elementLoader.SetAttribute("Address", backupEndPoint); // Set to Server Endpoint Value.
                 }
-                // END STATION 2 PLUS CONFIG GENERATION
+                // KITCHEN VIDEO CONFIG GENERATION
                 xmlLoader.Save(fullPath + fileName);
 
             }
 
+        }
+
+        private bool ErrorChecker()
+        {
+            if (stationCmbo.Text == "Total Stations")
+            {
+                MessageBox.Show("Please select station amount");
+                return false;
+            }
+
+            if (videoChkBox.Checked && videoCmbo.Text == "Total Videos")
+            {
+                MessageBox.Show("Please select video amount");
+                return false;
+            }
+
+            if (locationIDTxt.Text == "")
+            {
+                MessageBox.Show("Please fill in location ID");
+                return false;
+            }
+            else if (stationOneIpTxt.Text == "")
+            {
+                MessageBox.Show("Please fill in station one IP");
+                return false;
+            }
+            else if (serverEndPointTxt.Text == "")
+            {
+                MessageBox.Show("Please fill in the server end point");
+                return false;
+            }
+            else if (backupEndPointTxt.Text == "")
+            {
+                MessageBox.Show("Please fill in the backup end point");
+                return false;
+            }
+
+            List<int> enabledVideos = new List<int>();
+            for (int i = 0; i < _videos.Length; i++)
+            {
+                if (_videos[i].Enabled == true)
+                {
+                    enabledVideos.Add(i);
+                }
+            }
+
+            foreach (int index in enabledVideos)
+            {
+                if (_videos[index].Text == "")
+                {
+                    MessageBox.Show("Please verify all enabled video text boxes are filled");
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
