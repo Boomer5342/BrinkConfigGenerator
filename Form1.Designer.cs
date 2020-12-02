@@ -130,14 +130,14 @@
             this.registerAndVideo.Padding = new System.Windows.Forms.Padding(3);
             this.registerAndVideo.Size = new System.Drawing.Size(1135, 453);
             this.registerAndVideo.TabIndex = 2;
-            this.registerAndVideo.Text = "Register & Video";
+            this.registerAndVideo.Text = "Register & Kitchen";
             // 
             // ResetBtn
             // 
             this.ResetBtn.BackColor = System.Drawing.Color.LightCoral;
             this.ResetBtn.Font = new System.Drawing.Font("Tahoma", 10F);
             this.ResetBtn.ForeColor = System.Drawing.Color.Black;
-            this.ResetBtn.Location = new System.Drawing.Point(748, 377);
+            this.ResetBtn.Location = new System.Drawing.Point(934, 377);
             this.ResetBtn.Margin = new System.Windows.Forms.Padding(4);
             this.ResetBtn.Name = "ResetBtn";
             this.ResetBtn.Size = new System.Drawing.Size(176, 63);
@@ -151,7 +151,7 @@
             this.GenConfigBtn.BackColor = System.Drawing.Color.DarkSeaGreen;
             this.GenConfigBtn.Font = new System.Drawing.Font("Tahoma", 10F);
             this.GenConfigBtn.ForeColor = System.Drawing.Color.Black;
-            this.GenConfigBtn.Location = new System.Drawing.Point(934, 377);
+            this.GenConfigBtn.Location = new System.Drawing.Point(748, 377);
             this.GenConfigBtn.Margin = new System.Windows.Forms.Padding(4);
             this.GenConfigBtn.Name = "GenConfigBtn";
             this.GenConfigBtn.Size = new System.Drawing.Size(176, 63);
@@ -536,6 +536,7 @@
             this.stationOneIpTxt.Font = new System.Drawing.Font("Tahoma", 10F);
             this.stationOneIpTxt.Location = new System.Drawing.Point(116, 71);
             this.stationOneIpTxt.Margin = new System.Windows.Forms.Padding(4);
+            this.stationOneIpTxt.MaxLength = 20;
             this.stationOneIpTxt.Name = "stationOneIpTxt";
             this.stationOneIpTxt.Size = new System.Drawing.Size(185, 28);
             this.stationOneIpTxt.TabIndex = 5;
@@ -599,7 +600,7 @@
             this.stationCmbo.FormattingEnabled = true;
             this.stationCmbo.Location = new System.Drawing.Point(93, 29);
             this.stationCmbo.Margin = new System.Windows.Forms.Padding(4);
-            this.stationCmbo.MaxDropDownItems = 10;
+            this.stationCmbo.MaxDropDownItems = 50;
             this.stationCmbo.Name = "stationCmbo";
             this.stationCmbo.Size = new System.Drawing.Size(135, 29);
             this.stationCmbo.TabIndex = 1;
@@ -707,14 +708,14 @@
             this.register.Padding = new System.Windows.Forms.Padding(3);
             this.register.Size = new System.Drawing.Size(1135, 453);
             this.register.TabIndex = 3;
-            this.register.Text = "Register";
+            this.register.Text = "Single Register";
             // 
             // registerResetBtn
             // 
             this.registerResetBtn.BackColor = System.Drawing.Color.LightCoral;
             this.registerResetBtn.Font = new System.Drawing.Font("Tahoma", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.registerResetBtn.ForeColor = System.Drawing.Color.Black;
-            this.registerResetBtn.Location = new System.Drawing.Point(728, 376);
+            this.registerResetBtn.Location = new System.Drawing.Point(914, 376);
             this.registerResetBtn.Margin = new System.Windows.Forms.Padding(4);
             this.registerResetBtn.Name = "registerResetBtn";
             this.registerResetBtn.Size = new System.Drawing.Size(176, 63);
@@ -728,7 +729,7 @@
             this.registerGenConfigBtn.BackColor = System.Drawing.Color.DarkSeaGreen;
             this.registerGenConfigBtn.Font = new System.Drawing.Font("Tahoma", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.registerGenConfigBtn.ForeColor = System.Drawing.Color.Black;
-            this.registerGenConfigBtn.Location = new System.Drawing.Point(914, 376);
+            this.registerGenConfigBtn.Location = new System.Drawing.Point(728, 376);
             this.registerGenConfigBtn.Margin = new System.Windows.Forms.Padding(4);
             this.registerGenConfigBtn.Name = "registerGenConfigBtn";
             this.registerGenConfigBtn.Size = new System.Drawing.Size(176, 63);
@@ -775,6 +776,7 @@
             this.registerNumberTxt.Font = new System.Drawing.Font("Tahoma", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.registerNumberTxt.Location = new System.Drawing.Point(152, 40);
             this.registerNumberTxt.Margin = new System.Windows.Forms.Padding(4);
+            this.registerNumberTxt.MaxLength = 3;
             this.registerNumberTxt.Name = "registerNumberTxt";
             this.registerNumberTxt.Size = new System.Drawing.Size(50, 28);
             this.registerNumberTxt.TabIndex = 1;
@@ -893,27 +895,28 @@
             this.video.Padding = new System.Windows.Forms.Padding(3);
             this.video.Size = new System.Drawing.Size(1135, 453);
             this.video.TabIndex = 4;
-            this.video.Text = "Kitchen";
+            this.video.Text = "Single Kitchen";
             // 
             // videoResetBtn
             // 
             this.videoResetBtn.BackColor = System.Drawing.Color.LightCoral;
             this.videoResetBtn.Font = new System.Drawing.Font("Tahoma", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.videoResetBtn.ForeColor = System.Drawing.Color.Black;
-            this.videoResetBtn.Location = new System.Drawing.Point(728, 376);
+            this.videoResetBtn.Location = new System.Drawing.Point(914, 376);
             this.videoResetBtn.Margin = new System.Windows.Forms.Padding(4);
             this.videoResetBtn.Name = "videoResetBtn";
             this.videoResetBtn.Size = new System.Drawing.Size(176, 63);
             this.videoResetBtn.TabIndex = 6;
             this.videoResetBtn.Text = "Reset";
             this.videoResetBtn.UseVisualStyleBackColor = false;
+            this.videoResetBtn.Click += new System.EventHandler(this.videoResetBtn_Click);
             // 
             // videoGenConfigBtn
             // 
             this.videoGenConfigBtn.BackColor = System.Drawing.Color.DarkSeaGreen;
             this.videoGenConfigBtn.Font = new System.Drawing.Font("Tahoma", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.videoGenConfigBtn.ForeColor = System.Drawing.Color.Black;
-            this.videoGenConfigBtn.Location = new System.Drawing.Point(914, 376);
+            this.videoGenConfigBtn.Location = new System.Drawing.Point(728, 376);
             this.videoGenConfigBtn.Margin = new System.Windows.Forms.Padding(4);
             this.videoGenConfigBtn.Name = "videoGenConfigBtn";
             this.videoGenConfigBtn.Size = new System.Drawing.Size(176, 63);

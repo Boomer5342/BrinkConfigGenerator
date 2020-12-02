@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
+using BrinkConfigGenerator.services;
 using Microsoft.VisualBasic;
 
 namespace BrinkConfigGenerator
@@ -14,17 +15,7 @@ namespace BrinkConfigGenerator
     {
 
         private TextBox[] _videos;
-        private String[] regAndVidTxt;
-        private String[] regTxt;
-        private String[] vidTxt;
         private String _topDir;
-        private String[] _xmlPaths = new String[]
-
-        {
-            Application.StartupPath + @"\XMLConfigs\Station1\Register.cfg",
-            Application.StartupPath + @"\XMLConfigs\Station2Plus\Register.cfg",
-            Application.StartupPath + @"\XMLConfigs\Kitchen\Kitchen.cfg"
-        };
         public BrinkConfigGenerator()
         {
             InitializeComponent();
@@ -53,6 +44,41 @@ namespace BrinkConfigGenerator
         {
             stationCmbo.Items.AddRange(Enumerable.Range(1, 20).Select(i => (object)i).ToArray());
             videoCmbo.Items.AddRange(Enumerable.Range(1, 14).Select(i => (object)i).ToArray());
+        }
+
+        private String[,] RegAndVidTextBoxes()
+        {
+            String[,] regAndVidTxt = new String[,]
+            {
+                { locationIDTxt.Text, "Location ID" },
+                { backupEndPointTxt.Text, "Backup End Point" },
+                { stationOneIpTxt.Text, "Station 1 IP" },
+                { serverEndPointTxt.Text, "Server End Point" },
+            };
+            return regAndVidTxt;
+        }
+        private String[,] RegTextBoxes()
+        {
+            String[,] regTxt = new String[,]
+            {
+                { registerLocationIDTxt.Text, "Location ID" },
+                { registerBackupEndPointTxt.Text, "Backup End Point" },
+                { registerStationOneIPTxt.Text, "Station 1 IP" },
+                { registerServerEndPointTxt.Text, "Server End Point" },
+                { registerNumberTxt.Text, "Station Number" }
+            };
+            return regTxt;
+        }
+        private String[,] VidTextBoxes()
+        {
+            String[,] vidTxt = new String[,]
+            {
+                { kitchenLocationIdTxt.Text, "Location ID" },
+                { kitchenBackupEndPointTxt.Text, "Backup End Point" },
+                { kitchenStationOneIPTxt.Text, "Station 1 IP" },
+                { kitchenNumberTxt.Text, "Kitchen Number" }
+            };
+            return vidTxt;
         }
 
         private void VideoChkBox_CheckedChanged(object sender, EventArgs e)
@@ -178,25 +204,19 @@ namespace BrinkConfigGenerator
                     }
                 }
             }
-            regAndVidTxt = new String[]
-            {
-                locationIDTxt.Text,
-                backupEndPointTxt.Text,
-                stationOneIpTxt.Text,
-                serverEndPointTxt.Text
-            };
+
             for (int i = 1; i <= stationCount; i++)
             {
                 if (i == 1)
                 {
                     stationFullPath = _topDir + "\\Station 1";
-                    RegisterOneXMLModifier(regAndVidTxt, stationFullPath, "\\Register.cfg", 0);
+                    XMLModificationService.RegisterOneXMLModifier(RegAndVidTextBoxes(), stationFullPath, "\\Register.cfg", 0);
                 }
                 if (i != 1)
                 {
                     stationFullPath = _topDir + "\\Station " + i;
-                    RegisterTwoPlusXMLModifier(regAndVidTxt, stationFullPath, "\\Register.cfg", 1, i);
-                }
+                    XMLModificationService.RegisterTwoPlusXMLModifier(RegAndVidTextBoxes(), stationFullPath, "\\Register.cfg", 1, i);
+               }
             }
 
             List<String> videoNums = new List<String>();
@@ -212,7 +232,7 @@ namespace BrinkConfigGenerator
             for (int i = 0; i < videoNums.Count; i++)
             {
                 videoFullPath = _topDir + "\\Video " + videoNums[i];
-                KitchenXMLModifier(regAndVidTxt, videoFullPath, "\\Kitchen.cfg", 2, videoNums[i]);
+                XMLModificationService.KitchenXMLModifier(RegAndVidTextBoxes(), videoFullPath, "\\Kitchen.cfg", 2, videoNums[i]);
             }
 
             OpenFolder(_topDir);
@@ -234,116 +254,6 @@ namespace BrinkConfigGenerator
             {
                 MessageBox.Show(string.Format("{0} Directory does not exist!", folderPath));
             }
-        }
-
-        private void RegisterOneXMLModifier(String[] configChanges, String fullPath, String fileName, int index)
-        {
-            String[] elements = new String[]
-            {
-                "//Register",
-                "//Register//EndPoint",
-                "//Register//ServerEndPoint"
-            };
-
-            XmlDocument xmlLoader = new XmlDocument();
-            xmlLoader.Load(_xmlPaths[index]);
-            for (int i = 1; i <= elements.Length; i++)
-            {
-                XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i - 1]);
-                // STATION 1 CONFIG GENERATION
-                if (i == 1)
-                {
-                    elementLoader.SetAttribute("LocationUid", configChanges[0]); // Set to Location Value.
-                    elementLoader.SetAttribute("TerminalNumber", i.ToString()); // Set to the value of i.
-                }
-                else if (i == 2)
-                {
-                    elementLoader.SetAttribute("Address", configChanges[3]); // Set to Server Endpoint Value.
-                }
-                else if (i == 3)
-                {
-                    elementLoader.SetAttribute("Address", configChanges[3]); // Set to Server Endpoint Value.
-                }
-                // END STATION 1 CONFIG GENERATION
-
-            }
-            xmlLoader.Save(fullPath + fileName);
-        }
-        private void RegisterTwoPlusXMLModifier(String[] configChanges, String fullPath, String fileName, int index, int statNum)
-        {
-
-
-            String[] elements = new String[]
-            {
-                "//Register",
-                "//Register//EndPoint",
-                "//Register//ServerEndPoint",
-                "//Register//BackupEndPoint"
-            };
-
-            XmlDocument xmlLoader = new XmlDocument();
-            xmlLoader.Load(_xmlPaths[index]);
-            for (int i = 0; i < elements.Length; i++)
-            {
-                XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i]);
-                // STATION 2 PLUS CONFIG GENERATION
-                if (i == 0)
-                {
-                    elementLoader.SetAttribute("LocationUid", configChanges[0]); // Set to Location Value.
-                    elementLoader.SetAttribute("TerminalNumber", statNum.ToString()); // Set to the value of i.
-                }
-                else if (i == 1)
-                {
-                    elementLoader.SetAttribute("Address", configChanges[2]); // Set to Server Endpoint Value.
-                }
-                else if (i == 2)
-                {
-                    elementLoader.SetAttribute("Address", configChanges[3]); // Set to Server Endpoint Value.
-                }
-                else if (i == 3)
-                {
-                    elementLoader.SetAttribute("Address", configChanges[1]); // Set to Server Endpoint Value.
-                }
-                // END STATION 2 PLUS CONFIG GENERATION
-
-            }
-            xmlLoader.Save(fullPath + fileName);
-        }
-        private void KitchenXMLModifier(String[] configChanges, String fullPath, String fileName, int index, String videoNum)
-        {
-            String[] elements = new String[]
-            {
-                "//Kitchen",
-                "//Kitchen//EndPoint",
-                "//Kitchen//BackupEndPoint"
-            };
-
-            XmlDocument xmlLoader = new XmlDocument();
-            xmlLoader.Load(_xmlPaths[index]);
-            for (int i = 0; i < elements.Length; i++)
-            {
-                XmlElement elementLoader = (XmlElement)xmlLoader.SelectSingleNode(elements[i]);
-                Console.WriteLine(elements[i]);
-                Console.WriteLine(configChanges[0]);
-                // KITCHEN VIDEO CONFIG GENERATION
-                if (i == 0)
-                {
-                    elementLoader.SetAttribute("LocationUid", configChanges[0]); // Set to Location Value.
-                    elementLoader.SetAttribute("TerminalNumber", videoNum); // Set to the value of i.
-                }
-                else if (i == 1)
-                {
-                    elementLoader.SetAttribute("Address", configChanges[2]); // Set to Server Endpoint Value.
-                }
-                else if (i == 2)
-                {
-                    elementLoader.SetAttribute("Address", configChanges[1]); // Set to Server Endpoint Value.
-                }
-                // KITCHEN VIDEO CONFIG GENERATION
-                xmlLoader.Save(fullPath + fileName);
-
-            }
-
         }
 
         private void registerGenConfigBtn_Click(object sender, EventArgs e)
@@ -372,30 +282,23 @@ namespace BrinkConfigGenerator
                 Directory.CreateDirectory(stationFullPath);
             }
 
-            regTxt = new String[]
-            {
-                registerLocationIDTxt.Text,
-                registerBackupEndPointTxt.Text,
-                registerStationOneIPTxt.Text,
-                registerServerEndPointTxt.Text
-            };
-
             if (registerNumberTxt.Text == "1")
             {
                 stationFullPath = _topDir + "\\Station 1";
-                RegisterOneXMLModifier(regTxt, stationFullPath, "\\Register.cfg", 0);
+                XMLModificationService.RegisterOneXMLModifier(RegTextBoxes(), stationFullPath, "\\Register.cfg", 0);
             }
             else
             {
                 stationFullPath = _topDir + "\\Station " + registerNumberTxt.Text;
                 int statNum = int.Parse(registerNumberTxt.Text);
-                RegisterTwoPlusXMLModifier(regTxt, stationFullPath, "\\Register.cfg", 1, statNum);
+                XMLModificationService.RegisterTwoPlusXMLModifier(RegTextBoxes(), stationFullPath, "\\Register.cfg", 1, statNum);
             }
 
             OpenFolder(_topDir);
 
         }
 
+        // 3 Paramerters txt values from text boxes. combobox selected index. if combobox is disabled. selected tab
         private bool ErrorChecker()
         {
             if (registerVideoTab.SelectedTab == registerAndVideo)
@@ -408,7 +311,7 @@ namespace BrinkConfigGenerator
 
                 if (videoChkBox.Checked && videoCmbo.Text == "Total Videos")
                 {
-                    MessageBox.Show("Please select video amount", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Please select a video amount", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
 
@@ -556,18 +459,16 @@ namespace BrinkConfigGenerator
                 Directory.CreateDirectory(kitchenFullPath);
             }
 
-            vidTxt = new String[]
-            {
-                kitchenLocationIdTxt.Text,
-                kitchenBackupEndPointTxt.Text,
-                kitchenStationOneIPTxt.Text
-            };
-
             kitchenFullPath = _topDir + "\\Video " + kitchenNumberTxt.Text;
             String kitchenNum = kitchenNumberTxt.Text;
-            KitchenXMLModifier(vidTxt, kitchenFullPath, "\\Kitchen.cfg", 2, kitchenNum);
+            XMLModificationService.KitchenXMLModifier(VidTextBoxes(), kitchenFullPath, "\\Kitchen.cfg", 2, kitchenNum);
 
             OpenFolder(_topDir);
+
+        }
+
+        private void videoResetBtn_Click(object sender, EventArgs e)
+        {
 
         }
     }
