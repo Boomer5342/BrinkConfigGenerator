@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml;
 using BrinkConfigGenerator.services;
 using Microsoft.VisualBasic;
 
@@ -80,7 +79,16 @@ namespace BrinkConfigGenerator
             };
             return vidTxt;
         }
-
+        private String[,] VideosTextBoxes()
+        {
+            String[,] videoTextBoxes = new String[_videos.Length,_videos.Length];
+            for (int i = 0; i < _videos.Length; i++)
+            {
+                videoTextBoxes[i,0] = _videos[i].Text;
+                videoTextBoxes[i, 1] = ("Video " + (i + 1));
+            }
+            return videoTextBoxes;
+        }
         private void VideoChkBox_CheckedChanged(object sender, EventArgs e)
         {
             if (videoChkBox.Checked)
@@ -166,14 +174,22 @@ namespace BrinkConfigGenerator
             String videoFullPath = "";
             int videoCount = 0;
 
-            if (!ErrorChecker())
+            List<int> enabledVideos = new List<int>();
+            for (int i = 0; i < _videos.Length; i++)
             {
-                return;
+                if (_videos[i].Enabled == true)
+                {
+                    enabledVideos.Add(i);
+                }
             }
-            if (!FolderSelection())
+            int[] comboIndex = new int[]
             {
-                return;
-            }
+                stationCmbo.SelectedIndex,
+                videoCmbo.SelectedIndex
+            };
+            bool enabled = videoCmbo.Enabled;
+            if (!ErrorCheckingService.RegAndVidErrorChecker(comboIndex, enabled, RegAndVidTextBoxes(), VideosTextBoxes(), enabledVideos)) return;
+            if (!FolderSelection()) return;
 
             if (!Directory.Exists(_topDir))
             {
@@ -258,15 +274,9 @@ namespace BrinkConfigGenerator
 
         private void registerGenConfigBtn_Click(object sender, EventArgs e)
         {
-
-            if (!ErrorChecker())
-            {
-                return;
-            }
-            if (!FolderSelection())
-            {
-                return;
-            }
+            bool isStatOne = stationChkBox.Checked;
+            if (!ErrorCheckingService.SingleRegErrorChecker(RegTextBoxes(), isStatOne)) return;
+            if (!FolderSelection()) return;
 
             // Creates Root Dir
             if (!Directory.Exists(_topDir))
@@ -297,117 +307,6 @@ namespace BrinkConfigGenerator
             OpenFolder(_topDir);
 
         }
-
-        // 3 Paramerters txt values from text boxes. combobox selected index. if combobox is disabled. selected tab
-        private bool ErrorChecker()
-        {
-            if (registerVideoTab.SelectedTab == registerAndVideo)
-            {
-                if (stationCmbo.Text == "Total Stations")
-                {
-                    MessageBox.Show("Please select station amount", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-
-                if (videoChkBox.Checked && videoCmbo.Text == "Total Videos")
-                {
-                    MessageBox.Show("Please select a video amount", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-
-                if (locationIDTxt.Text == "")
-                {
-                    MessageBox.Show("Please fill in location ID", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                else if (stationOneIpTxt.Text == "")
-                {
-                    MessageBox.Show("Please fill in station one IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                else if (serverEndPointTxt.Text == "")
-                {
-                    MessageBox.Show("Please fill in the server end point", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                else if (backupEndPointTxt.Text == "")
-                {
-                    MessageBox.Show("Please fill in the backup end point", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-
-                List<int> enabledVideos = new List<int>();
-                for (int i = 0; i < _videos.Length; i++)
-                {
-                    if (_videos[i].Enabled == true)
-                    {
-                        enabledVideos.Add(i);
-                    }
-                }
-
-                foreach (int index in enabledVideos)
-                {
-                    if (_videos[index].Text == "")
-                    {
-                        MessageBox.Show("Please verify all enabled video text boxes are filled", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return false;
-                    }
-                }
-            }
-            else if (registerVideoTab.SelectedTab == register)
-            {
-                if (registerNumberTxt.Text == "")
-                {
-                    MessageBox.Show("Please provide a Station Number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                if (registerLocationIDTxt.Text == "")
-                {
-                    MessageBox.Show("Please fill in the Register Location ID", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                if (registerServerEndPointTxt.Text == "")
-                {
-                    MessageBox.Show("Please provide a server end point", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                if (!stationChkBox.Checked && registerStationOneIPTxt.Text == "")
-                {
-                    MessageBox.Show("Please provide station 1's IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                if (!stationChkBox.Checked && registerBackupEndPointTxt.Text == "")
-                {
-                    MessageBox.Show("Please provide a backup end point", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-            }
-            else if (registerVideoTab.SelectedTab == video)
-            {
-                if (kitchenNumberTxt.Text == "")
-                {
-                    MessageBox.Show("Please provide kitchen terminal number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                if (kitchenLocationIdTxt.Text == "")
-                {
-                    MessageBox.Show("Please provide a location ID", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                if (kitchenBackupEndPointTxt.Text == "")
-                {
-                    MessageBox.Show("Please provide backup end point", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-                if (kitchenStationOneIPTxt.Text == "")
-                {
-                    MessageBox.Show("Please provide station 1's IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-            }
-            return true;
-        }
-
         private void registerResetBtn_Click(object sender, EventArgs e)
         {
             registerNumberTxt.Text = "";
@@ -436,15 +335,8 @@ namespace BrinkConfigGenerator
 
         private void videoGenConfigBtn_Click(object sender, EventArgs e)
         {
-            if (!ErrorChecker())
-            {
-                return;
-            }
-            if (!FolderSelection())
-            {
-                return;
-            }
-
+            if (!ErrorCheckingService.SingleVideoErrorChecker(VidTextBoxes())) return;
+            if (!FolderSelection()) return;
             // Creates Root Dir
             if (!Directory.Exists(_topDir))
             {
@@ -469,7 +361,10 @@ namespace BrinkConfigGenerator
 
         private void videoResetBtn_Click(object sender, EventArgs e)
         {
-
+            kitchenNumberTxt.Text = "";
+            kitchenLocationIdTxt.Text = "";
+            kitchenBackupEndPointTxt.Text = "";
+            kitchenStationOneIPTxt.Text = "";
         }
     }
 }
