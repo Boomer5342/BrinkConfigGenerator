@@ -1,0 +1,89 @@
+Drop Down List for Backup End Point & Server End point
+Get List Location ID's:
+	- Open Program
+		- Select Admin Portal (admin2, admin3, admin8, etc.., etc..)
+		- Select Location Group (ADUB, Cousins, etc.., etc..)
+		- Select Location Within Group (ADUB Winneconne)
+		- This will Fill in LOCATION ID, SERVER END POINT, and BACKUP END POINT.
+		
+DATABASE TABLES:
+	- Users
+		- Columns
+			- User ID
+			- Username
+			- Password
+			- User Role
+	- Admin Portals
+		- Columns
+			- Portal ID
+			- Portal Name: (admin8.brinkpos.net AKA Admin 8)
+			- Portal End Point: (app8.brinkpos.net)
+	- Location Groups
+		- Columns
+			- Group ID
+			- Group Name: (ADUB, Cousins, etc..)
+			- Portal ID: (Relates to the portal this group is under)
+	- Location
+		- Columns
+			- Location ID (Might use the actual location id on the admin portal.)
+			- Location Name: (A&W Manitowoc)
+			- Group ID
+		
+Create Login System.
+	- 2 User Types System Administrator, Admin
+		- System Administrator
+			- Can add new admin users.
+			- Can Do everything Admin can do
+		- Admin
+			- Can Add new Admin Portals, Location Groups, and Locations.
+			
+Administrator Form
+	- Add User
+		- User Name
+		- User Password
+	- Update User
+		- User Name
+		- User Password
+	- Remove User
+	- All Same Functionality as Admin
+Admin Form
+	[ADD LOCATION/GROUP/PORTAL]
+	- Add new Portal
+		- Portal Name: (admin8.brinkpos.net AKA Admin 8)
+		- Portal End Point: (app20.brinkpos.net)
+	- Add new Location Group
+		- Select Admin Portal
+			- Location Group Name
+	- Add new Location
+		- Select Admin Portal
+			- Select Location Group
+				- Location ID
+				- Location Name
+
+	[UPDATE LOCATION/GROUP/PORTAL]
+	- Update Portal
+		- Portal Name: (admin8.brinkpos.net AKA Admin 8)
+		- Portal End Point: (app20.brinkpos.net)
+	- Update Location Group
+		- Admin Portal
+			- Location Group Name
+	- Update Location
+		- Admin Portal
+			- Location Group
+				- Location ID
+				- Location Name
+	
+	[DELETE LOCATION/GROUP/PORTAL]
+	- Delete Portal
+		- Deletes ALL Locations within Location Groups
+		- Deletes ALL Groups
+		- Deletes Portal
+	- Delete Location Group
+		- Select Admin Portal
+			- Select Location Group
+				- Deletes ALL Locations within Location Group
+				- Deletes Group
+	- Delete Location
+		-Select Admin Portal
+			- Select Location Group
+				- Select Location
