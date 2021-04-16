@@ -1,4 +1,4 @@
-# My new project
+# Brink Config Generator
 
 ## Introduction
 
